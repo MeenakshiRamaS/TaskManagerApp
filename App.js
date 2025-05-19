@@ -7,8 +7,13 @@ import {
   View,
   Button,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import { useState, useRef } from "react";
+import * as Progress from "react-native-progress";
+import { ScrollView, Keyboard } from "react-native";
+import styles from "./Styles";
+// import Components
 
 export default function App() {
   // Always call hooks at the top, no early returns before hooks
@@ -18,17 +23,19 @@ export default function App() {
   });
 
   // State declarations
-  const [newTaskName, setNewTaskName] = useState("");
-  const [newTaskTime, setNewTaskTime] = useState("");
-  const [tasksList, setTasksList] = useState([]);
-  const taskCounter = useRef(0); // useRef for mutable task ID counter
-  const [error, setError] = useState("");
+  const [newTaskName, setNewTaskName] = useState("");   //state for Task Name
+  const [newTaskDesc, setNewTaskDesc] = useState("");   //state for Task Description
+  const [newTaskDate, setNewTaskDate] = useState("");   //state for Task Date
+  const [newTaskTime, setNewTaskTime] = useState("");   //state for Task Time
+  const [tasksList, setTasksList] = useState([]);       //state for list of Tasks
+  const taskCounter = useRef(0);                        // useRef to create a unique ID for each task
+  const [error, setError] = useState("");               // error for invalid user input
 
   if (!fontsLoaded) {
-    return null; // Render nothing until fonts are loaded
+    return null; // check edge case just in case
   }
 
-  // Filtering tasks
+  // use a filter to create 2 new arrays or lists of complete and incomplete tasks
   const completeTasks = tasksList.filter((t) => t.complete);
   const incompleteTasks = tasksList.filter((t) => !t.complete);
 
@@ -37,14 +44,22 @@ export default function App() {
   const completePercent =
     totalTasks === 0 ? 0 : (completeTasks.length / totalTasks) * 100;
 
+  /*  Event Handler: adding a new task
+      Function Description: uses useStates for task name and time to create a new task object.
+      New task is added to taskList which enters task into Incomplete Section.
+      User input is reset after task has been successfully added.
+  */
   const handleAddTask = () => {
-    if (newTaskName.trim().length === 0) {
-      setError("Input cannot be empty.");
+    // edge cases for invalid input and error handling
+    if (newTaskName.trim().length === 0 || newTaskTime.trim().length === 0) {
+      setError("Invalid Input");
       return;
     }
+    // no error
     setError("");
-    taskCounter.current += 1; // Increment the ref counter
+    taskCounter.current += 1; // counter for unique ID for this new task
 
+    // create a new task object based on user input
     const newTask = {
       id: taskCounter.current,
       name: newTaskName,
@@ -52,21 +67,33 @@ export default function App() {
       complete: false,
     };
 
+    // add new task to tasksList
     setTasksList([...tasksList, newTask]);
 
-    // Reset inputs after adding task
+    // after task has been successfully added reset the user input for task name and hours
     setNewTaskName("");
     setNewTaskTime("");
+    Keyboard.dismiss(); // incase react-native doesn't automtically dismiss the keyboard
   };
 
+  /*  Event Handler: setting complete/incomplete tasks to opposite boolean value
+      Function Description: uses a task's ID to find task in the tasksList and set
+      the corresponding task object's complete field (boolean) to the opposite value
+  */
   const toggleComplete = (id) => {
     setTasksList(
+      // map through tasksList until task with corresponding ID is found
       tasksList.map((task) =>
+        // set a new value to complete
         task.id === id ? { ...task, complete: !task.complete } : task,
       ),
     );
   };
 
+  /*  Event Handler: deleting a task
+      Function Description: uses a task's ID to find task in the tasksList and
+      render a new tasksList without the corresponding task object from the original tasksList
+  */
   const deleteTask = (id) => {
     setTasksList(tasksList.filter((task) => task.id !== id));
   };
@@ -89,7 +116,7 @@ export default function App() {
         onChangeText={setNewTaskTime}
       />
 
-      {error ? <Text style={{ color: "red" }}>{error}</Text> : null}
+      {error ? <Text style={{ color: "#92140C" }}>{error}</Text> : null}
 
       <TouchableOpacity
         onPress={handleAddTask}
@@ -103,164 +130,128 @@ export default function App() {
         <Text style={{ color: "#FFF8F0", textAlign: "center" }}>Add</Text>
       </TouchableOpacity>
 
-      {/* List of Incomplete Tasks */}
-      <Text style={styles.subSectionICandC}>Incomplete Tasks</Text>
-      {incompleteTasks.map((task) => (
-        <View key={task.id} style={styles.taskItem}>
-          <TouchableOpacity
-            onPress={() => toggleComplete(task.id)}
-            style={styles.gencheckbox}
+      {/* Progress Bar (differs based on tasks length and whathas been completed) */}
+      <View style={{ alignItems: "center", marginTop: 16 }}>
+        {incompleteTasks.length === 0 && completeTasks.length === 0 ? (
+          <Text
+            style={{
+              fontSize: 16,
+              color: "#1E1E24",
+              fontFamily: "Quicksand-Light",
+            }}
           >
-            <View style={styles.uncheckedBox} />
-          </TouchableOpacity>
-          <View style={styles.taskTextContainer}>
-            <Text style={styles.taskName}>{task.name}</Text>
-            <Text style={styles.taskTime}>{task.time} hours</Text>
+            Nothing to do today!
+          </Text>
+        ) : incompleteTasks.length === 0 && completeTasks.length > 0 ? (
+          <View
+            style={{
+              flexDirection: "col",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 16,
+            }}
+          >
+            <Progress.Bar
+              progress={completePercent / 100}
+              width={200}
+              height={10}
+              color="#92140C"
+              unfilledColor="#DDD"
+              backgroundColor="#FFF8F0"
+              borderRadius={5}
+              style={{ marginTop: 8 }}
+            />
+            <Text
+              style={{
+                fontSize: 16,
+                color: "#1E1E24",
+                fontFamily: "Quicksand-Light",
+              }}
+            >
+              All tasks are completed!
+            </Text>
           </View>
-          <Button
-            title="X"
-            color="#92140C"
-            onPress={() => deleteTask(task.id)}
-          />
-        </View>
-      ))}
-
-      {/* List of Completed Tasks */}
-      <Text style={styles.subSectionICandC}>Completed Tasks</Text>
-      {completeTasks.map((task) => (
-        <View key={task.id} style={[styles.taskItem, styles.completedTask]}>
-          <TouchableOpacity
-            onPress={() => toggleComplete(task.id)}
-            style={styles.gencheckbox}
+        ) : (
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 16,
+              fontFamily: "Quicksand-Light",
+            }}
           >
-            <View style={styles.checkedBox}>
-              <Text style={{ color: "#FFF8F0" }}>✓</Text>
+            <Progress.Bar
+              progress={completePercent / 100}
+              width={200}
+              height={10}
+              color="#92140C"
+              backgroundColor="#FFF8F0"
+              borderRadius={5}
+              style={{ marginTop: 8 }}
+            />
+            <Text
+              style={{
+                fontSize: 16,
+                color: "#1E1E24",
+                fontFamily: "Quicksand-Light",
+              }}
+            >
+              {Math.floor(completePercent)}% of your way there!
+            </Text>
+          </View>
+        )}
+      </View>
+
+      <ScrollView
+        contentContainerStyle={{ padding: 20, indicatorStyle: "black" }}
+      >
+        {/* List of Incomplete Tasks (used map) */}
+        <Text style={styles.subSectionICandC}>Incomplete Tasks</Text>
+        {incompleteTasks.map((task) => (
+          <View key={task.id} style={styles.taskItem}>
+            <TouchableOpacity
+              onPress={() => toggleComplete(task.id)}
+              style={styles.gencheckbox}
+            >
+              <View style={styles.uncheckedBox} />
+            </TouchableOpacity>
+            <View style={styles.taskTextContainer}>
+              <Text style={styles.taskName}>{task.name}</Text>
+              <Text style={styles.taskTime}>{task.time} hours</Text>
             </View>
-          </TouchableOpacity>
-          <View style={styles.taskTextContainer}>
-            <Text style={styles.completedTextName}>{task.name}</Text>
-            <Text style={styles.completedTextTime}>{task.time} hours</Text>
+            <Button
+              title="X"
+              color="#92140C"
+              onPress={() => deleteTask(task.id)}
+            />
           </View>
-          <Button
-            title="X"
-            color="#92140C"
-            onPress={() => deleteTask(task.id)}
-          />
-        </View>
-      ))}
-
+        ))}
+        {/* List of Completed Tasks (used map) */}
+        <Text style={styles.subSectionICandC}>Completed Tasks</Text>
+        {completeTasks.map((task) => (
+          <View key={task.id} style={[styles.taskItem, styles.completedTask]}>
+            <TouchableOpacity
+              onPress={() => toggleComplete(task.id)}
+              style={styles.gencheckbox}
+            >
+              <View style={styles.checkedBox}>
+                <Text style={{ color: "#FFF8F0" }}>✓</Text>
+              </View>
+            </TouchableOpacity>
+            <View style={styles.taskTextContainer}>
+              <Text style={styles.completedTextName}>{task.name}</Text>
+              <Text style={styles.completedTextTime}>{task.time} hours</Text>
+            </View>
+            <Button
+              title="X"
+              color="#92140C"
+              onPress={() => deleteTask(task.id)}
+            />
+          </View>
+        ))}
+      </ScrollView>
       <StatusBar style="auto" />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  // general
-  container: {
-    flex: 1,
-    paddingTop: 70,
-    paddingHorizontal: 20,
-    backgroundColor: "#FFF8F0",
-  },
-  // Task Manager title styling
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
-    fontFamily: "Quicksand-Bold",
-    color: "#92140C",
-    borderColor: "#1E1E24",
-  },
-  // input fields styling
-  input: {
-    borderWidth: 1,
-    borderColor: "#1E1E24",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    borderColor: "#1E1E24",
-    fontFamily: "Quicksand-Light",
-  },
-
-  // title of subsections for complete and incomplete tasks
-  subSectionICandC: {
-    fontSize: 20,
-    marginVertical: 10,
-    fontWeight: "600",
-    fontFamily: "Quicksand-Bold",
-    marginTop: 40,
-  },
-
-  // displaying of each task item
-  taskItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderColor: "#1E1E24",
-    fontFamily: "Quicksand-Light",
-  },
-  // change style of completed tasks to have a strikethrough
-  completedTextName: {
-    textDecorationLine: "line-through",
-    color: "#1E1E24",
-  },
-  taskButtons: {
-    flexDirection: "row",
-    gap: 5,
-  },
-  gencheckbox: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  uncheckedBox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: "#92140C",
-    borderRadius: 3,
-  },
-
-  checkedBox: {
-    width: 20,
-    height: 20,
-    backgroundColor: "#92140C",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 3,
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-
-  taskTextContainer: {
-    flex: 1,
-    flexDirection: "column",
-    fontFamily: "Quicksand-Light",
-    color: "#1E1E24",
-  },
-
-  taskName: {
-    fontSize: 16,
-
-    color: "#1E1E24",
-  },
-  taskTime: {
-    fontSize: 12,
-  },
-
-  completedTextName: {
-    fontSize: 16,
-  },
-
-  completedTextTime: {
-    fontSize: 12,
-    textDecorationLine: "line-through",
-    color: "#1E1E24",
-  },
-});
