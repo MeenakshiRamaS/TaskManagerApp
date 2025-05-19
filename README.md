@@ -60,7 +60,7 @@ My goal was to implement functionality then design/CSS. I used several different
 My future steps for this application would be to integrate a back end for user authentication and storing tasks. I would ideally use Google Firebase's Firestore and Auth to do this. Once a backend is implemented, I would deploy this application so it can be downloaded and used across devices!
 
 ## Additional Notes
-I used [Coolers](https://coolors.co/palette/1e1e24-92140c-fff8f0) for a color palette for this application and [Google Fonts](https://fonts.google.com/selection) to import Quicksand (one of my all time favorite fonts!)
+I used [Coolers](https://coolors.co/palette/1e1e24-92140c-fff8f0) for a color palette for this application and [Google Fonts](https://fonts.google.com/specimen/Quicksand) to import Quicksand (one of my all time favorite fonts!)
 
 ## Thank you!
 Thank you so much for providing me with this opportunity to showcase my technical skills! If there are any technical issues with accessing or viewing this project please let me know!
