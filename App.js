@@ -13,19 +13,15 @@ import { useState, useRef } from "react";
 import * as Progress from "react-native-progress";
 import { ScrollView, Keyboard } from "react-native";
 import styles from "./Styles";
-// import Components
 
 export default function App() {
-  // Always call hooks at the top, no early returns before hooks
+  // fonts from google fonts
   const [fontsLoaded] = useFonts({
     "Quicksand-Bold": require("./assets/fonts/Quicksand-Bold.ttf"),
     "Quicksand-Light": require("./assets/fonts/Quicksand-Medium.ttf"),
   });
 
-  // State declarations
   const [newTaskName, setNewTaskName] = useState("");   //state for Task Name
-  const [newTaskDesc, setNewTaskDesc] = useState("");   //state for Task Description
-  const [newTaskDate, setNewTaskDate] = useState("");   //state for Task Date
   const [newTaskTime, setNewTaskTime] = useState("");   //state for Task Time
   const [tasksList, setTasksList] = useState([]);       //state for list of Tasks
   const taskCounter = useRef(0);                        // useRef to create a unique ID for each task
@@ -39,7 +35,7 @@ export default function App() {
   const completeTasks = tasksList.filter((t) => t.complete);
   const incompleteTasks = tasksList.filter((t) => !t.complete);
 
-  // Percentage of completed tasks (handle divide by zero)
+  // percentage of completed tasks for progress bar (0 when no tasks)
   const totalTasks = completeTasks.length + incompleteTasks.length;
   const completePercent =
     totalTasks === 0 ? 0 : (completeTasks.length / totalTasks) * 100;
@@ -76,9 +72,11 @@ export default function App() {
     Keyboard.dismiss(); // incase react-native doesn't automtically dismiss the keyboard
   };
 
-  /*  Event Handler: setting complete/incomplete tasks to opposite boolean value
+  /*  Event Handler: setting complete/incomplete tasks to opposite boolean value in checkbox
       Function Description: uses a task's ID to find task in the tasksList and set
-      the corresponding task object's complete field (boolean) to the opposite value
+      the corresponding task object's complete field (boolean) to the opposite value. Note
+      this switches the task from Incomplete to Complete or vice versa as changes are made to
+      the tasksList and this makes react native re render the page.
   */
   const toggleComplete = (id) => {
     setTasksList(
