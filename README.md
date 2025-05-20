@@ -36,8 +36,9 @@ In order to run this application on your local device please follow the followin
    B. Use Expo Go
      1. Install the app "Expo Go" on phone (both Android and iOS will work)
      2. Once installed, create an account on Expo Go
-     3. Use phone's camera app to ccan the QR code available in terminal (where the Task Manager Application was run)
-     4. Wait for TaskManagerApp to download
+     3. Use phone's camera app to can the QR code available in terminal (where the Task Manager Application was run).
+     4. ***Note: phone and browser must be on the same wifi for this!!
+     5. Wait for TaskManagerApp to download
 5. Add your tasks!
 
 ## App Features
