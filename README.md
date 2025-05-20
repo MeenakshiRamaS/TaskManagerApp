@@ -32,8 +32,8 @@ In order to run this application on your local device please follow the followin
 2. Check that Node.js is installed (if not please install)
 3. Navigate to the directory that repository was cloned in then run "npm start" or "npx expo start" in terminal
 4. Open application in one of the following ways
-   A. type "w" to open application on the web
-   B. Use Expo Go
+   1. type "w" to open application on the web
+   2. Use Expo Go
      1. Install the app "Expo Go" on phone (both Android and iOS will work)
      2. Once installed, create an account on Expo Go
      3. Use phone's camera app to can the QR code available in terminal (where the Task Manager Application was run).
