@@ -11,7 +11,6 @@
 5. Design Process with Figma
 6. Future Steps
 7. Additional Notes
-8. Thank you!
 
 ## Project Description
 This is a Task Manager Application that enables users to track their daily tasks. Users are able to add new tasks, check off tasks when completed, and track their progress!
@@ -60,7 +59,3 @@ My future steps for this application would be to integrate a back end for user a
 
 ## Additional Notes
 I used [Coolers](https://coolors.co/palette/1e1e24-92140c-fff8f0) for a color palette for this application and [Google Fonts](https://fonts.google.com/specimen/Quicksand) to import Quicksand (one of my all time favorite fonts!)
-
-## Thank you!
-Thank you so much for providing me with this opportunity to showcase my technical skills! If there are any technical issues with accessing or viewing this project please let me know!
-Additionally, if you require any further details on my part such as an unofficial transcript please let me know! I am excited about the possibility of contributing to Chapter One this summer! Thank you, and I look forward to hearing about the next steps in this application process!
